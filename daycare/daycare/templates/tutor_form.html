@@ -1,0 +1,137 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    {% if object %}Editar Tutor: {{ object.name }}{% else %}Cadastrar Novo Tutor{% endif %}
+{% endblock %}
+
+{% block extra_head %}
+    {{ form.media }}
+{% endblock %}
+
+{% block content %}
+<div class="card shadow-sm p-4">
+    <h1 class="fw-bold text-success">
+        {% if object %}
+            ✏️ Editar Tutor — <span class="text-primary">{{ object.name }}</span>
+        {% else %}
+            🧑‍🤝‍🧑 Cadastrar Novo Tutor
+        {% endif %}
+    </h1>
+    <p class="text-muted mb-3">Preencha os dados do responsável pelo pet.</p>
+
+    <hr>
+
+    <form method="post">
+        {% csrf_token %}
+
+        <h5 class="text-primary mt-3">Informações Pessoais</h5>
+        <div class="row g-3 mt-1">
+            <div class="col-md-6">
+                <label class="form-label">Nome Completo</label>
+                {{ form.name }}
+            </div>
+            <div class="col-md-6">
+                <label class="form-label">CPF</label>
+                {{ form.cpf }}
+            </div>
+            <div class="col-md-6">
+                <label class="form-label">Telefone</label>
+                {{ form.phone_number }}
+            </div>
+            <div class="col-md-6">
+                <label class="form-label">Email</label>
+                {{ form.email }}
+            </div>
+        </div>
+
+        <h5 class="text-primary mt-4">Endereço</h5>
+        <div class="row g-3 mt-1">
+            <div class="col-md-12">
+                <label class="form-label">Endereço Completo</label>
+                {{ form.address }}
+            </div>
+            <div class="col-md-6">
+                <label class="form-label">Estado</label>
+                {{ form.state }}
+            </div>
+            <div class="col-md-6">
+                <label class="form-label">Cidade</label>
+                {{ form.city }}
+            </div>
+        </div>
+
+        <h5 class="text-primary mt-4">Outras Informações</h5>
+        <div class="row g-3 mt-1 mb-4">
+            <div class="col-md-6">
+                <label class="form-label">Como nos conheceu?</label>
+                {{ form.know }}
+            </div>
+        </div>
+
+        <div class="d-flex justify-content-end gap-2 pt-3 border-top">
+            <a href="{% url 'tutor_list' %}" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left"></i> Cancelar
+            </a>
+        
+            <button type="submit" class="btn btn-success px-4 shadow-sm">
+                {% if object %}
+                    <i class="fas fa-save"></i> Salvar Alterações
+                {% else %}
+                    <i class="fas fa-user-plus"></i> Cadastrar Tutor
+                {% endif %}
+            </button>
+        </div>
+    </form>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    // Aplica classes de estilo automaticamente
+    document.querySelectorAll('input:not([type="checkbox"]):not([type="radio"]), textarea')
+        .forEach(el => el.classList.add('form-control'));
+
+    document.querySelectorAll('select')
+        .forEach(el => el.classList.add('form-select'));
+
+    const addressField = document.getElementById("id_address");
+    if (addressField) addressField.setAttribute('rows', '2');
+});
+
+// Máscaras
+document.addEventListener("DOMContentLoaded", function () {
+
+    // CPF → 000.000.000-00
+    const cpf = document.getElementById("id_cpf");
+    if (cpf) {
+        cpf.addEventListener("input", function () {
+            let v = cpf.value.replace(/\D/g, "");
+            if (v.length > 11) v = v.slice(0, 11);
+            v = v.replace(/^(\d{3})(\d)/, "$1.$2");
+            v = v.replace(/^(\d{3})\.(\d{3})(\d)/, "$1.$2.$3");
+            v = v.replace(/(\d{3})(\d{1,2})$/, "$1-$2");
+            cpf.value = v;
+        });
+    }
+
+    // Telefone → (00) 90000-0000 ou (00) 0000-0000
+    const phone = document.getElementById("id_phone_number");
+    if (phone) {
+        phone.addEventListener("input", function () {
+            let v = phone.value.replace(/\D/g, "");
+            if (v.length > 11) v = v.slice(0, 11);
+
+            if (v.length <= 10) {
+                v = v.replace(/^(\d{2})(\d)/, "($1) $2");
+                v = v.replace(/(\d{4})(\d)/, "$1-$2");
+            } else {
+                v = v.replace(/^(\d{2})(\d)/, "($1) $2");
+                v = v.replace(/(\d{5})(\d)/, "$1-$2");
+            }
+            phone.value = v;
+        });
+    }
+});
+</script>
+{% endblock %}

@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Nota de Serviço - {{ note.note_number }}</title>
+
+    <style>
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            margin: 25px;
+            color: #2c2c2c;
+        }
+        .header {
+            text-align: center;
+            border-bottom: 3px solid #333;
+            padding-bottom: 10px;
+            margin-bottom: 25px;
+        }
+        .header h2 {
+            margin: 0;
+            font-size: 28px;
+        }
+        .header small {
+            font-size: 14px;
+        }
+        .section {
+            margin-bottom: 18px;
+        }
+        .section h3 {
+            margin-bottom: 5px;
+            font-size: 20px;
+            border-bottom: 1px solid #bfbfbf;
+            padding-bottom: 3px;
+        }
+        .box {
+            border: 1px solid #bfbfbf;
+            padding: 10px;
+            border-radius: 5px;
+        }
+        .line {
+            display: flex;
+            justify-content: space-between;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 8px;
+        }
+        table th, table td {
+            border: 1px solid #bfbfbf;
+            padding: 8px;
+            text-align: center;
+        }
+        .totals {
+            margin-top: 15px;
+            float: right;
+            width: 45%;
+        }
+        .totals table {
+            font-size: 16px;
+        }
+        .signature {
+            margin-top: 60px;
+            text-align: center;
+        }
+        .signature div {
+            border-top: 1px solid #000;
+            width: 350px;
+            margin: auto;
+            padding-top: 5px;
+        }
+
+        @media print {
+            .btn-print {
+                display: none;
+            }
+        }
+
+        .btn-print {
+            display: inline-block;
+            background: #047ad8;
+            color: #fff;
+            padding: 10px 18px;
+            border-radius: 5px;
+            text-decoration: none;
+            margin-bottom: 15px;
+        }
+    </style>
+</head>
+
+<body>
+
+<a class="btn-print" href="#" onclick="window.print()">🖨 Imprimir Nota</a>
+
+<div class="header">
+    <h2>Nota de Serviço</h2>
+    <small>Nº {{ note.note_number }}</small>
+</div>
+
+<!-- DADOS DO CLIENTE -->
+<div class="section">
+    <h3>Dados do Tutor</h3>
+    <div class="box">
+        <div class="line"><b>Nome:</b> {{ note.scheduling.tutor.name }}</div>
+        <div class="line"><b>Telefone:</b> {{ note.scheduling.tutor.phone }}</div>
+        <div class="line"><b>Email:</b> {{ note.scheduling.tutor.email }}</div>
+    </div>
+</div>
+
+<!-- PET -->
+<div class="section">
+    <h3>Dados do Pet</h3>
+    <div class="box">
+        <div class="line"><b>Nome:</b> {{ note.scheduling.pet.name }}</div>
+        <div class="line"><b>Espécie:</b> {{ note.scheduling.pet.species }}</div>
+        <div class="line"><b>Raça:</b> {{ note.scheduling.pet.breed }}</div>
+    </div>
+</div>
+
+<!-- SERVIÇOS -->
+<div class="section">
+    <h3>Serviços Realizados</h3>
+    <table>
+        <thead>
+        <tr>
+            <th>Serviço</th>
+            <th>Valor</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for service in note.scheduling.services.all %}
+        <tr>
+            <td>{{ service.name }}</td>
+            <td>R$ {{ service.price|floatformat:2 }}</td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<!-- TOTAIS -->
+<div class="totals">
+    <table>
+        <tr>
+            <th style="text-align: left;">Valor Bruto:</th>
+            <td>R$ {{ note.scheduling.gross_total_value|floatformat:2 }}</td>
+        </tr>
+        <tr>
+            <th style="text-align: left;">Desconto:</th>
+            <td>- R$ {{ discount_amount|floatformat:2 }}</td>
+        </tr>
+        <tr>
+            <th style="text-align: left;">Valor Final:</th>
+            <td><b>R$ {{ note.scheduling.total_value|floatformat:2 }}</b></td>
+        </tr>
+    </table>
+</div>
+<div style="clear: both;"></div>
+
+<!-- RODAPÉ -->
+<div class="signature">
+    <div>Assinatura do Responsável</div>
+</div>
+
+<p style="text-align: center; margin-top: 15px; font-size: 12px;">
+    Documento gerado em {{ note.created_at|date:"d/m/Y H:i" }}
+</p>
+
+<script>
+    // auto scroll
+    window.onload = () => window.scrollTo(0,0);
+</script>
+
+</body>
+</html>

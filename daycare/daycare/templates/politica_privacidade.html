@@ -1,0 +1,113 @@
+{% extends 'base.html' %} 
+{% load static %}
+
+{% block title %}Política de Privacidade - Pet Maniacos{% endblock %}
+
+{% block content %}
+<div class="container py-2">
+    <div class="card shadow-sm p-4 p-md-5">
+        <h1 class="mb-4 text-center text-primary">🔒 Política de Privacidade</h1>
+        <p class="lead text-center text-muted mb-5">
+            Esta política descreve como o **Pet Maniacos** coleta, usa, armazena e protege as informações de nossos usuários e clientes.
+        </p>
+
+        <h2 class="h4 border-bottom pb-2 mb-3 mt-4">1. 📑 Informações Coletadas</h2>
+        <p>Coletamos vários tipos de informações para fornecer e melhorar o nosso serviço:</p>
+
+        <h3 class="h5 mt-3 text-secondary">1.1. Dados Pessoais de Tutores</h3>
+        <ul class="list-group list-group-flush mb-3">
+            <li class="list-group-item"><strong>Dados de Identificação:</strong> Nome completo, CPF, RG.</li>
+            <li class="list-group-item"><strong>Dados de Contato:</strong> Endereço, telefone e e-mail.</li>
+            <li class="list-group-item"><strong>Dados de Acesso (para funcionários/administradores):</strong> Nome de usuário e senha criptografada.</li>
+        </ul>
+
+        <h3 class="h5 mt-3 text-secondary">1.2. Dados Pessoais de Pets</h3>
+        <ul class="list-group list-group-flush mb-3">
+            <li class="list-group-item"><strong>Identificação do Pet:</strong> Nome, espécie, raça, data de nascimento e sexo.</li>
+            <li class="list-group-item"><strong>Histórico e Saúde:</strong> Informações sobre vacinas, alergias e condições médicas.</li>
+        </ul>
+
+        <h3 class="h5 mt-3 text-secondary">1.3. Dados de Serviços e Agendamentos</h3>
+        <ul class="list-group list-group-flush mb-3">
+            <li class="list-group-item">Registros de serviços contratados e históricos de agendamentos.</li>
+        </ul>
+        
+        <hr>
+
+        <h2 class="h4 border-bottom pb-2 mb-3 mt-4">2. 💡 Uso das Informações Coletadas</h2>
+        <p>Utilizamos os dados coletados para as seguintes finalidades:</p>
+        
+        <table class="table table-bordered table-striped">
+            <thead class="table-primary">
+                <tr>
+                    <th>Finalidade</th>
+                    <th>Descrição</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>Prestação de Serviços</strong></td>
+                    <td>Agendar serviços e garantir o histórico médico do pet.</td>
+                </tr>
+                <tr>
+                    <td><strong>Comunicação com o Tutor</strong></td>
+                    <td>Envio de lembretes, confirmações e informações de saúde essenciais.</td>
+                </tr>
+                <tr>
+                    <td><strong>Melhoria e Gestão</strong></td>
+                    <td>Análise interna para otimizar processos e planejar estoque.</td>
+                </tr>
+                <tr>
+                    <td><strong>Cumprimento Legal</strong></td>
+                    <td>Atender a requisições legais e regulatórias.</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <hr>
+
+        <h2 class="h4 border-bottom pb-2 mb-3 mt-4">3. 🛡️ Armazenamento e Segurança dos Dados</h2>
+        <p>Empregamos medidas de segurança técnicas e organizacionais para proteger as informações, incluindo:</p>
+        <ul class="list-unstyled">
+            <li><i class="fas fa-check-circle text-success me-2"></i> **Criptografia** de senhas.</li>
+            <li><i class="fas fa-check-circle text-success me-2"></i> Uso de **Firewalls** e protocolos de segurança.</li>
+            <li><i class="fas fa-check-circle text-success me-2"></i> Acesso restrito apenas a funcionários autorizados.</li>
+        </ul>
+        <p class="small text-muted mt-2">Seus dados são armazenados em servidores seguros.</p>
+
+        <hr>
+
+        <h2 class="h4 border-bottom pb-2 mb-3 mt-4">4. 🔗 Compartilhamento de Informações</h2>
+        <p>O Pet Maniacos **não vende nem aluga** suas informações pessoais. Compartilhamos seus dados apenas com:</p>
+        <ul class="list-unstyled">
+            <li><i class="fas fa-angle-right me-2"></i> **Prestadores de Serviço:** Para fins de operação (ex: envio de e-mail marketing).</li>
+            <li><i class="fas fa-angle-right me-2"></i> **Obrigação Legal:** Quando exigido por lei ou ordem judicial.</li>
+            <li><i class="fas fa-angle-right me-2"></i> **Com seu Consentimento:** Com a sua autorização explícita.</li>
+        </ul>
+        
+        <hr>
+
+        <h2 class="h4 border-bottom pb-2 mb-3 mt-4">5. 🧑‍⚖️ Direitos do Titular dos Dados (LGPD)</h2>
+        <p>Você tem o direito de:</p>
+        <ul class="list-group list-group-flush mb-3">
+            <li class="list-group-item">Acessar e solicitar a correção dos seus dados.</li>
+            <li class="list-group-item">Solicitar a exclusão dos seus dados pessoais (sujeito à retenção legal).</li>
+            <li class="list-group-item">Revogar o consentimento para o uso dos dados.</li>
+        </ul>
+
+        <hr>
+
+        <h2 class="h4 border-bottom pb-2 mb-3 mt-4">6. 📞 Contato</h2>
+        <p>Para exercer seus direitos ou tirar dúvidas, entre em contato com nosso Encarregado de Dados (DPO):</p>
+        <p class="mb-1"><strong>E-mail:</strong> [Seu E-mail de Contato]</p>
+        <p class="mb-1"><strong>Telefone:</strong> [Seu Telefone de Contato]</p>
+        <p class="mb-1"><strong>Endereço:</strong> [Seu Endereço Físico ou Local de Negócios]</p>
+
+        <hr class="mt-4">
+
+        <h2 class="h4 border-bottom pb-2 mb-3 mt-4">7. 🗓️ Alterações a Esta Política</h2>
+        <p>Reservamos o direito de atualizar esta Política. Recomendamos que você a revise periodicamente.</p>
+        <p class="text-muted small"><strong>Última Atualização:</strong> Dezembro de 2025</p>
+    </div>
+</div>
+{% endblock %}

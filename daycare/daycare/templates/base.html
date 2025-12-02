@@ -1,0 +1,494 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Pet Maniacos{% endblock %}</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+    <style>
+        :root {
+            --sidebar-width: 250px;
+            --sidebar-collapsed-width: 70px;
+            --primary-color: #0d6efd;
+            --secondary-bg: #f7f9fc;
+        }
+
+        body {
+            min-height: 100vh;
+            display: flex;
+            background-color: var(--secondary-bg);
+        }
+
+        /* --- SIDEBAR --- */
+        #sidebar {
+            width: var(--sidebar-width);
+            height: 100vh;
+            position: fixed;
+            top: 0;
+            left: 0;
+            background-color: #fff;
+            padding: 10px;
+            box-shadow: 2px 0 15px rgba(0,0,0,0.07);
+            overflow: hidden;
+            z-index: 1050;
+            display: flex;
+            flex-direction: column;
+            transition: width 0.3s;
+        }
+
+        #sidebar.collapsed {
+            width: var(--sidebar-collapsed-width);
+        }
+
+        /* SIDEBAR HEADER (LOGO + BOTÃO RECOLHER) */
+        #sidebar .sidebar-header {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 5px 10px 15px 10px;
+            height: 90px;
+            position: relative;
+        }
+
+        #sidebar.collapsed .sidebar-header {
+            justify-content: center;
+            padding: 5px 0 15px 0;
+        }
+
+        #sidebar .sidebar-header img {
+            height: auto;
+            max-height: 70px;
+            width: auto;
+            transition: all 0.3s;
+            object-fit: contain;
+        }
+
+        #sidebar.collapsed .sidebar-header img {
+            max-height: 40px;
+            width: 40px;
+        }
+
+        /* BOTÃO RECOLHER DENTRO DA SIDEBAR */
+        .toggle-sidebar-btn {
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            font-size: 1.2rem;
+            color: #495057;
+            transition: transform 0.3s, color 0.3s;
+        }
+
+        .toggle-sidebar-btn:hover {
+            color: var(--primary-color);
+        }
+
+        /* Ícone gira ao recolher */
+        #sidebar.collapsed .toggle-sidebar-btn i {
+            transform: rotate(180deg);
+        }
+
+        /* Container do botão: visível apenas no desktop */
+        .toggle-sidebar-container {
+            display: flex;
+            justify-content: flex-end;
+            padding-top: 5px;
+            margin-bottom: 10px;
+        }
+
+        #sidebar.collapsed .toggle-sidebar-container {
+            display: none;
+        }
+
+        /* LINKS SIDEBAR */
+        .sidebar-link {
+            padding: 10px 10px;
+            display: flex;
+            align-items: center;
+            color: #495057;
+            text-decoration: none;
+            border-radius: 6px;
+            margin-bottom: 5px;
+            font-weight: 500;
+            transition: background-color 0.2s, color 0.2s;
+        }
+
+        .sidebar-link i {
+            min-width: 40px;
+            font-size: 1.2rem;
+            text-align: center;
+        }
+
+        .sidebar-link .link-text {
+            white-space: nowrap;
+            transition: opacity 0.3s, max-width 0.3s;
+        }
+
+        .sidebar-link:hover {
+            background-color: #e9ecef;
+            color: var(--primary-color);
+        }
+
+        .sidebar-link.active {
+            background-color: var(--primary-color);
+            color: #fff;
+            font-weight: bold;
+        }
+
+        #sidebar.collapsed .link-text {
+            opacity: 0;
+            max-width: 0;
+            overflow: hidden;
+        }
+
+        #sidebar.collapsed .sidebar-link {
+            justify-content: center;
+        }
+
+        /* BOTÃO SAIR */
+        .sidebar-logout-button {
+            border: none;
+            background: none;
+            cursor: pointer;
+            padding: 10px;
+            text-align: left;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            font-weight: 500;
+            border-radius: 6px;
+            transition: background-color 0.2s;
+            color: #495057;
+        }
+
+        .sidebar-logout-button i {
+            min-width: 40px;
+            text-align: center;
+        }
+
+        .sidebar-logout-button:hover {
+            background-color: #dc35451a;
+            color: #e9182c !important;
+        }
+
+        #sidebar.collapsed .sidebar-logout-button {
+            justify-content: center;
+        }
+
+        /* CONTEÚDO PRINCIPAL */
+        #content-wrapper {
+            margin-left: var(--sidebar-width);
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            transition: margin-left 0.3s;
+            width: 100%;
+        }
+
+        #content-wrapper.full-width-content {
+            margin-left: 0;
+        }
+
+        #sidebar.collapsed ~ #content-wrapper {
+            margin-left: var(--sidebar-collapsed-width);
+        }
+
+        /* TOP BAR */
+        #top-bar {
+            background-color: #fff;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+            width: 100%;
+            position: sticky;
+            top: 0;
+            z-index: 1020;
+        }
+
+        /* LOGO CENTRALIZADA TOPBAR */
+        #topbar-logo-centered {
+            height: 45px;
+            width: auto;
+            object-fit: contain;
+        }
+
+        /* --- FOOTER --- */
+        footer {
+            background-color: #212529; 
+            color: #adb5bd;
+            padding: 40px 0 20px 0;
+            margin-top: auto;
+            font-size: 0.9rem;
+        }
+
+        footer h5 {
+            color: #fff;
+            font-weight: 600;
+            margin-bottom: 15px;
+            font-size: 1rem;
+        }
+
+        footer a {
+            color: #adb5bd;
+            text-decoration: none;
+            transition: color 0.2s;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        footer a:hover {
+            color: var(--primary-color);
+            text-decoration: none;
+        }
+
+        /* Estilo dos ícones sociais */
+        .social-icons {
+            display: flex;
+            justify-content: center; 
+            margin-bottom: 15px !important; 
+        }
+
+        .social-icons a {
+            color: #adb5bd;
+            margin: 0 8px;
+            font-size: 1.4rem; 
+        }
+
+        /* RESPONSIVIDADE */
+        .overlay {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1040;
+            display: none;
+        }
+
+        @media (min-width: 992px) {
+            .social-icons {
+                justify-content: flex-start; 
+            }
+        }
+
+        @media (max-width: 991.98px) {
+            #sidebar { left: calc(-1 * var(--sidebar-width)); }
+            #sidebar.open { left: 0; }
+            #sidebar.open ~ .overlay { display: block; }
+            #content-wrapper { margin-left: 0; }
+        }
+    </style>
+
+    {% block extra_head %}{% endblock %}
+</head>
+<body>
+{% if user.is_authenticated %}
+<nav id="sidebar" class="sidebar-expanded">
+    <div class="sidebar-header">
+        <a class="navbar-brand" href="{% url 'home' %}">
+            <img id="sidebar-logo" src="{% static 'img/logo2.png' %}" 
+                data-full-src="{% static 'img/logo2.png' %}" 
+                data-collapsed-src="{% static 'img/logo_small.png' %}" 
+                alt="Logo" class="img-fluid sidebar-logo">
+        </a>
+    </div>
+
+    <div id="sidebar-collapsible-content">
+        <div class="toggle-sidebar-container d-none d-lg-flex">
+            <button id="desktop-sidebar-toggle" class="toggle-sidebar-btn">
+                <i class="fas fa-angle-left fa-lg"></i>
+            </button>
+        </div>
+
+        <ul class="list-unstyled components mb-2">
+            <hr>
+            <li><a href="{% url 'dashboard' %}" class="sidebar-link {% if request.path == '/dashboard/' %}active{% endif %}"><i class="fas fa-chart-line"></i> <span class="link-text">Dashboard</span></a></li>
+            <hr>
+            <li><a href="{% url 'home' %}" class="sidebar-link {% if request.resolver_match.url_name == 'home' %}active{% endif %}"><i class="fas fa-home"></i> <span class="link-text">Home</span></a></li>
+            <li><a href="{% url 'tutor_list' %}" class="sidebar-link {% if 'tutores' in request.path %}active{% endif %}"><i class="fas fa-users"></i> <span class="link-text">Tutores</span></a></li>
+            <li><a href="{% url 'pet_list' %}" class="sidebar-link {% if 'pets' in request.path %}active{% endif %}"><i class="fas fa-paw"></i> <span class="link-text">Pets</span></a></li>
+            <li><a href="{% url 'service_list' %}" class="sidebar-link {% if 'service' in request.path %}active{% endif %}"><i class="fas fa-tools"></i> <span class="link-text">Serviços</span></a></li>
+            <li><a href="{% url 'scheduling_list' %}" class="sidebar-link {% if 'agendamentos' in request.path %}active{% endif %}"><i class="fas fa-calendar-alt"></i> <span class="link-text">Agendamentos</span></a></li>
+            <hr>
+        </ul>
+    </div>
+
+    <div class="mt-auto pt-3 border-top">
+        <form method="post" action="{% url 'logout' %}">
+            {% csrf_token %}
+            <button type="submit" class="sidebar-logout-button text-danger">
+                <i class="fas fa-sign-out-alt"></i> <span class="link-text">Sair</span>
+            </button>
+        </form>
+    </div>
+</nav>
+<div class="overlay d-lg-none"></div>
+{% endif %}
+
+<div id="content-wrapper" {% if not user.is_authenticated %}class="full-width-content"{% endif %}>
+    {% if user.is_authenticated %}
+    <nav id="top-bar" class="navbar navbar-expand-lg py-2">
+        <div class="container-fluid pe-4">
+            <button id="mobile-sidebar-toggle" class="btn btn-primary me-3 d-lg-none" type="button">
+                <i class="fas fa-bars"></i>
+            </button>
+
+            <div class="container-fluid justify-content-center">
+                <a href="{% url 'home' %}">
+                    <img id="topbar-logo-centered" src="{% static 'img/logo2.png' %}" 
+                        alt="Logo Pet Maniacos" 
+                        class="d-block mx-auto">
+                </a>
+            </div>
+
+            <div class="d-flex align-items-center gap-3 ms-lg-auto">
+                <div class="dropdown">
+                    <button class="btn btn-light d-flex align-items-center gap-2 dropdown-toggle shadow-sm" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="fas fa-user-circle fa-lg text-primary"></i>
+                        <span class="fw-medium">{{ user.first_name|default:user.username }}</span>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end shadow border-0">
+                        <li><a class="dropdown-item d-flex align-items-center gap-2" href="{% url 'admin:index' %}"><i class="fas fa-cog text-muted"></i> Configurações (Admin)</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li>
+                            <form method="post" action="{% url 'logout' %}">
+                                {% csrf_token %}
+                                <button type="submit" class="dropdown-item text-danger d-flex align-items-center gap-2"><i class="fas fa-sign-out-alt"></i> Sair</button>
+                            </form>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </nav>
+    {% endif %}
+
+    <div class="container-fluid px-4 mt-3">
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show shadow-sm" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+    </div>
+
+    <main class="container-fluid py-4 flex-grow-1 px-4">
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer class="text-start">
+        <div class="container-fluid">
+            <div class="row">
+                
+                <div class="col-lg-4 col-md-6 mb-4 mb-lg-0">
+                    <h5 class="text-uppercase">Pet Maniacos</h5>
+                    <p>
+                        Cuidamos do seu melhor amigo com paixão e profissionalismo. 
+                        Nossa missão é garantir a saúde e alegria de cada pet.
+                    </p>
+                </div>
+
+                <div class="col-lg-2 col-md-6 mb-4 mb-lg-0">
+                    <h5>Navegação</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="{% url 'home' %}">Início</a></li>
+                        <li><a href="{% url 'service_list'%}">Serviços</a></li>
+                        <li><a href="{% url 'contato' %}">Contato</a></li>
+                    </ul>
+                </div>
+
+                <div class="col-lg-3 col-md-6 mb-4 mb-lg-0">
+                    <h5>Ajuda & Legal</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="{% url 'politica_privacidade' %}">Política de Privacidade</a></li>
+                        <li><a href="{% url 'termos_de_uso' %}">Termos de Uso</a></li>
+                        <li><a href="{% url 'faq' %}">FAQ</a></li>
+                    </ul>
+                </div>
+
+                <div class="col-lg-3 col-md-6 mb-4 mb-lg-0">
+                    <h5>Siga-nos</h5>
+                    <div class="social-icons mb-3">
+                        <a href="#" class="me-2"><i class="fa-brands fa-facebook-f"></i></a>
+                        <a href="#" class="me-2"><i class="fa-brands fa-instagram"></i></a>
+                        <a href="#" class="me-2"><i class="fa-brands fa-whatsapp"></i></a>
+                        <a href="#" class="me-2"><i class="fa-brands fa-twitter"></i></a>
+                    </div>
+                    <p class="small text-center text-md-start">Atendimento rápido via WhatsApp!</p>
+                </div>
+
+            </div>
+            
+            <hr class="mt-4 mb-3 border-secondary opacity-25">
+
+            <div class="row">
+                <div class="col-12 text-center">
+                    <p class="mb-0 small text-light">
+                        &copy; 2025 Pet Maniacos. Todos os direitos reservados.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </footer>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const sidebar = document.getElementById('sidebar');
+    const desktopToggle = document.getElementById('desktop-sidebar-toggle');
+    const mobileToggle = document.getElementById('mobile-sidebar-toggle');
+    const overlay = document.querySelector('.overlay');
+    const sidebarLogo = document.getElementById('sidebar-logo'); 
+    const SIDEBAR_STATE_KEY = 'sidebarCollapsedState';
+
+    if (sidebar) {
+        const toggleLogo = () => {
+            if (!sidebarLogo) return;
+            const isCollapsed = sidebar.classList.contains('collapsed');
+            sidebarLogo.src = isCollapsed ? sidebarLogo.dataset.collapsedSrc : sidebarLogo.dataset.fullSrc;
+        };
+
+        const applySavedState = () => {
+            const savedState = localStorage.getItem(SIDEBAR_STATE_KEY);
+            if (savedState === 'true') sidebar.classList.add('collapsed');
+            else sidebar.classList.remove('collapsed');
+            toggleLogo();
+        };
+
+        const saveNewState = () => {
+            localStorage.setItem(SIDEBAR_STATE_KEY, sidebar.classList.contains('collapsed').toString());
+        };
+
+        applySavedState();
+
+        desktopToggle?.addEventListener('click', () => {
+            sidebar.classList.toggle('collapsed');
+            toggleLogo();
+            saveNewState();
+        });
+
+        mobileToggle?.addEventListener('click', () => {
+            sidebar.classList.toggle('open');
+            if (overlay) overlay.style.display = sidebar.classList.contains('open') ? 'block' : 'none';
+        });
+
+        overlay?.addEventListener('click', () => {
+            sidebar.classList.remove('open');
+            overlay.style.display = 'none';
+        });
+
+        window.addEventListener('resize', () => {
+            if (window.innerWidth >= 992 && sidebar.classList.contains('open')) {
+                sidebar.classList.remove('open');
+                overlay.style.display = 'none';
+            }
+        });
+    }
+});
+</script>
+{% block extra_js %}{% endblock %}
+</body>
+</html>

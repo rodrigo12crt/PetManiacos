@@ -1,0 +1,125 @@
+{% extends 'base.html' %}
+
+{% block title %}Lista de Pets{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+
+    <style>
+
+        .pet-card {
+            transition: transform 0.25s ease, box-shadow 0.25s ease;
+            border-radius: 18px;
+            overflow: hidden;
+        }
+
+        .pet-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 8px 22px rgba(0, 0, 0, 0.12);
+        }
+
+        .pet-img-wrapper {
+            height: 250px;
+            overflow: hidden;
+        }
+
+        .pet-card-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.4s ease;
+        }
+
+        .pet-card:hover .pet-card-img {
+            transform: scale(1.07);
+        }
+
+        .bg-success-subtle {
+            background: #eaf8ec;
+        }
+
+        @media (max-width: 576px) {
+            h1.fw-bold {
+                font-size: 1.6rem;
+            }
+            .btn-lg {
+                font-size: 1rem;
+            }
+        }
+    </style>
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="fw-bold text-success m-0">🐾 Galeria dos Pets</h1>
+        <a href="{% url 'pet_create' %}" class="btn btn-success shadow-sm px-4">
+            <i class="fas fa-plus"></i> Novo Pet
+        </a>
+    </div>
+
+    <form method="get" class="mb-4">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="input-group shadow-sm">
+                    <span class="input-group-text bg-white">🔍</span>
+                    <input type="text" name="q" class="form-control form-control-lg"
+                        placeholder="Buscar pet pelo nome..."
+                        value="{{ search_term }}">
+                    <button class="btn btn-primary btn-lg px-4">Buscar</button>
+                </div>
+            </div>
+        </div>
+    </form>
+
+    <div class="alert alert-light border shadow-sm text-center mb-5 fs-5">
+        📌 Temos atualmente <strong class="text-success">{{ pet_list|length }}</strong> pets cadastrados!
+    </div>
+
+    {% if pet_list %}
+    <div class="row g-4">
+        {% for pet in pet_list %}
+            <div class="col-12 col-md-6 col-lg-4 d-flex">
+                <div class="pet-card card shadow-sm border-0 w-100">
+
+                    {% if pet.photo %}
+                        <div class="pet-img-wrapper">
+                            <img src="{{ pet.photo.url }}" alt="Foto de {{ pet.name }}" class="pet-card-img">
+                        </div>
+                    {% else %}
+                        <div class="pet-img-wrapper d-flex justify-content-center align-items-center bg-light">
+                            <span class="text-muted fs-4">📸 Sem foto</span>
+                        </div>
+                    {% endif %}
+
+                    <div class="card-body text-center py-3">
+                        <h4 class="fw-bold text-dark mb-1">{{ pet.name }}</h4>
+                        <p class="text-muted small mb-2">
+                            {{ pet.species }}{% if pet.race %} — {{ pet.race }}{% endif %}
+                        </p>
+                        <span class="badge bg-success-subtle text-success px-3 py-2">
+                            👤 {{ pet.tutor.name }}
+                        </span>
+                    </div>
+
+                    <div class="card-footer bg-white border-0 text-center pb-3">
+                        <a href="{% url 'pet_detail' pet.pk %}"
+                            class="btn btn-outline-success px-3 py-2 rounded-pill">
+                            Ver Detalhes
+                        </a>
+                    </div>
+
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+
+    {% else %}
+        <div class="alert alert-warning shadow-sm text-center fs-5 py-4">
+            {% if search_term %}
+                ❌ Nenhum pet encontrado para "<strong>{{ search_term }}</strong>".
+                <a href="{% url 'pet_list' %}" class="text-primary">Limpar busca</a>
+            {% else %}
+                😕 Nenhum pet cadastrado ainda.
+            {% endif %}
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,96 @@
+{% extends 'base.html' %}
+
+{% block title %}
+{% if object %}Editar Serviço: {{ object.name }}{% else %}Novo Serviço{% endif %}
+{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="card shadow-lg p-4 rounded-4 border-0">
+                
+                <h1 class="fw-bold text-success text-center mb-4">
+                    <i class="fas fa-tools"></i> 
+                    {% if object %}Editar Serviço{% else %}Cadastrar Novo Serviço{% endif %}
+                </h1>
+                <p class="text-center text-muted mb-4">
+                    Detalhes do serviço oferecido (ex: Banho, Tosa, Daycare).
+                </p>
+                <hr>
+
+                <form method="post">
+                    {% csrf_token %}
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold" for="{{ form.name.id_for_label }}">Nome do Serviço</label>
+                        {{ form.name }}
+                        {% if form.name.errors %}
+                            <small class="text-danger">{{ form.name.errors }}</small>
+                        {% endif %}
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold" for="{{ form.price.id_for_label }}">Preço (R$)</label>
+                        {{ form.price }}
+                        {% if form.price.errors %}
+                            <small class="text-danger">{{ form.price.errors }}</small>
+                        {% endif %}
+                        <small class="form-text text-muted">Use ponto como separador decimal (ex: 10.50).</small>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label fw-bold" for="{{ form.description.id_for_label }}">Descrição</label>
+                        {{ form.description }}
+                        {% if form.description.errors %}
+                            <small class="text-danger">{{ form.description.errors }}</small>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="d-flex justify-content-end gap-2 pt-3 border-top">
+                        <a href="{% url 'service_list' %}" class="btn btn-outline-secondary">
+                            <i class="fas fa-arrow-left"></i> Cancelar
+                        </a>
+
+                        <button type="submit" class="btn btn-success px-4 shadow-sm">
+                            <i class="fas fa-save"></i> 
+                            {% if object %}Salvar Alterações{% else %}Cadastrar Serviço{% endif %}
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+
+    const applyBootstrapStyles = () => {
+
+        document.querySelectorAll(
+            'input:not([type=submit]):not([type=checkbox]):not([type=radio]), textarea'
+        ).forEach(el => {
+            el.classList.add('form-control');
+        });
+
+
+        const descriptionField = document.getElementById('{{ form.description.id_for_label }}');
+        if (descriptionField) descriptionField.setAttribute('rows', 3);
+
+
+        const priceField = document.getElementById('{{ form.price.id_for_label }}');
+        if (priceField) {
+            priceField.setAttribute('type', 'number');
+            priceField.setAttribute('step', '0.01');
+            priceField.setAttribute('min', '0');     
+        }
+    };
+
+    applyBootstrapStyles();
+});
+</script>
+{% endblock %}

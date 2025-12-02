@@ -1,0 +1,140 @@
+{% extends 'base.html' %}
+{% load l10n %} 
+
+{% block title %}
+{% if object %}Editar Agendamento: {{ object }}{% else %}Criar Novo Agendamento{% endif %}
+{% endblock %}
+
+{% block extra_head %}
+    {{ form.media }} 
+{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="card p-4 shadow-sm">
+        <h1 class="fw-bold text-success">
+            <i class="fas fa-calendar-check"></i> Agendar Serviço
+            {% if not object %}✂️{% endif %}
+        </h1>
+        <p class="text-muted">Preencha os detalhes para um novo agendamento, incluindo o pet, os serviços e a data.</p>
+        <hr>
+        
+        <form method="post">
+            {% csrf_token %}
+            
+            <div class="row mb-3">
+                <div class="col-md-4">
+                    <label for="{{ form.tutor.id_for_label }}" class="form-label fw-bold">Tutor</label>
+                    {{ form.tutor }}
+                </div>
+                <div class="col-md-4">
+                    <label for="{{ form.pet.id_for_label }}" class="form-label fw-bold">Pet</label>
+                    {{ form.pet }}
+                    {% if form.pet.errors %}
+                        <div class="text-danger small">{{ form.pet.errors }}</div>
+                    {% endif %}
+                </div>
+                <div class="col-md-4">
+                    <label for="{{ form.date_scheduling.id_for_label }}" class="form-label fw-bold">Data do Agendamento</label>
+                    {{ form.date_scheduling }}
+                </div>
+            </div>
+
+            <div class="mb-4">
+                <label for="{{ form.services.id_for_label }}" class="form-label fw-bold">Serviços Selecionados</label>
+                <div class="border rounded p-2 bg-light">
+                    {{ form.services }}
+                </div>
+                <p class="form-text text-muted">Use Ctrl ou Shift para selecionar múltiplos serviços.</p>
+            </div>
+            
+            <div class="alert alert-primary text-center" role="alert">
+                <strong>💰 Valor Bruto Estimado:</strong> <span id="gross-total-display" class="h4">R$ 0,00</span>
+            </div>
+
+            <div class="row mb-4">
+                <div class="col-md-6">
+                    <label for="{{ form.status.id_for_label }}" class="form-label fw-bold">Status de Pagamento</label>
+                    {{ form.status }}
+                </div>
+                <div class="col-md-6">
+                    <label for="{{ form.percentage_discount.id_for_label }}" class="form-label fw-bold">Desconto Percentual (%)</label>
+                    {{ form.percentage_discount }}
+                </div>
+            </div>
+
+            <div class="mb-4">
+                <label for="{{ form.observations.id_for_label }}" class="form-label fw-bold">Observações</label>
+                {{ form.observations }} 
+            </div>
+            
+            <div class="d-flex justify-content-end pt-3 border-top gap-2">
+                <a href="{% url 'scheduling_list' %}" class="btn btn-outline-secondary">
+                    <i class="fas fa-arrow-left"></i> Cancelar
+                </a>
+                <button type="submit" class="btn btn-success px-4 shadow-sm">
+                    <i class="fas fa-save"></i> 
+                    {% if object %}Salvar Alterações{% else %}Salvar Agendamento{% endif %}
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+
+        const applyBootstrapStyles = () => {
+            document.querySelectorAll(
+                'input:not([type=submit]):not([type=checkbox]):not([type=radio]), select:not([multiple]), textarea'
+            ).forEach(el => {
+                if (el.tagName === 'SELECT') {
+                    el.classList.add('form-select');
+                } else {
+                    el.classList.add('form-control');
+                }
+            });
+
+            const obsField = document.querySelector('#{{ form.observations.id_for_label }}');
+            if (obsField) obsField.setAttribute('rows', '3'); 
+            
+            const dateField = document.querySelector('#{{ form.date_scheduling.id_for_label }}');
+            if (dateField) dateField.setAttribute('type', 'date');
+        };
+
+        applyBootstrapStyles();
+        
+        // 1. Mapeia os dados de preço injetados pela View
+        const servicesData = JSON.parse('{{ services_json|escapejs }}');
+        const servicePriceMap = new Map();
+        servicesData.forEach(service => {
+            servicePriceMap.set(String(service.id), parseFloat(service.price));
+        });
+
+        const servicesSelect = document.querySelector('#{{ form.services.id_for_label }}');
+        const totalDisplay = document.querySelector('#gross-total-display');
+
+        function calculateTotal() {
+            let grossTotal = 0;
+            let selectedOptions = Array.from(servicesSelect.selectedOptions);
+            
+            selectedOptions.forEach(option => {
+                const serviceId = option.value;
+                const price = servicePriceMap.get(serviceId);
+                if (price) {
+                    grossTotal += price;
+                }
+            });
+
+            totalDisplay.textContent = 'R$ ' + grossTotal.toFixed(2).replace('.', ',');
+        }
+        
+        servicesSelect.addEventListener('change', calculateTotal);
+        
+        // Garante que o cálculo inicial é feito ao carregar a página
+        calculateTotal();
+    });
+</script>
+{% endblock %}

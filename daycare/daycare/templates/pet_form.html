@@ -1,0 +1,121 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    {% if object %}Editar Pet: {{ object.name }}{% else %}Cadastrar Novo Pet{% endif %}
+{% endblock %}
+
+{% block content %}
+<div class="card shadow-sm border-0 p-4">
+    <h1 class="fw-bold text-success">
+        {% if object %}
+            Editar Pet: {{ object.name }} 🐾
+        {% else %}
+            Cadastrar Novo Pet 🐾
+        {% endif %}
+    </h1>
+    <p class="text-muted mb-3">Preencha os dados do pet e selecione o tutor responsável.</p>
+    <hr>
+
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <label for="{{ form.name.id_for_label }}" class="form-label">Nome</label>
+                {{ form.name }}
+            </div>
+            <div class="col-md-6">
+                <label for="{{ form.tutor.id_for_label }}" class="form-label">Tutor</label>
+                {{ form.tutor }}
+            </div>
+        </div>
+
+        <div class="row mb-3">
+            <div class="col-md-4">
+                <label for="{{ form.species.id_for_label }}" class="form-label">Espécie</label>
+                {{ form.species }}
+            </div>
+            <div class="col-md-4">
+                <label for="{{ form.race.id_for_label }}" class="form-label">Raça</label>
+                {{ form.race }}
+            </div>
+            <div class="col-md-4">
+                <label for="{{ form.sex.id_for_label }}" class="form-label">Sexo</label>
+                {{ form.sex }}
+            </div>
+        </div>
+
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <label for="{{ form.age.id_for_label }}" class="form-label">Idade</label>
+                {{ form.age }}
+            </div>
+            <div class="col-md-6">
+                <label for="{{ form.weight.id_for_label }}" class="form-label">Peso (kg)</label>
+                {{ form.weight }}
+            </div>
+        </div>
+
+        <div class="row mb-3">
+            <div class="col-md-8">
+                <label for="{{ form.medical_observations.id_for_label }}" class="form-label">Observações Médicas</label>
+                {{ form.medical_observations }}
+            </div>
+            <div class="col-md-4">
+                <label for="{{ form.photo.id_for_label }}" class="form-label">Foto do Pet</label>
+                {{ form.photo }}
+
+                {% if object.photo %}
+                <div class="mt-2 p-2 border rounded bg-light">
+                    <span class="text-muted d-block small mb-1">Foto atual:</span>
+                    <img src="{{ object.photo.url }}" class="img-thumbnail" style="max-height: 130px; object-fit: cover;">
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="d-flex justify-content-end border-top pt-3 gap-2">
+            <a href="{% url 'pet_list' %}" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left"></i> Cancelar
+            </a>
+            <button type="submit" class="btn btn-success px-4 shadow-sm">
+                {% if object %}
+                    <i class="fas fa-save"></i> Salvar Alterações
+                {% else %}
+                    <i class="fas fa-paw"></i> Cadastrar Pet
+                    {# Alternativa: <i class="fas fa-plus"></i> Cadastrar Pet #}
+                {% endif %}
+            </button>
+        </div>
+    </form>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+
+    document.querySelectorAll('input:not([type="file"]), select, textarea').forEach(el => {
+        if (!el.classList.contains('form-control') && !el.classList.contains('form-select')) {
+            if (el.tagName === "SELECT") {
+                el.classList.add('form-select');
+            } else {
+                el.classList.add('form-control');
+            }
+        }
+    });
+
+    // Ajusta file input
+    const fileInput = document.querySelector('input[type="file"]');
+    if (fileInput) {
+        fileInput.classList.remove('form-control');
+        fileInput.classList.add('form-control');
+    }
+
+    // Ajusta textarea Observações
+    const obs = document.getElementById('{{ form.medical_observations.id_for_label }}');
+    if (obs) obs.setAttribute('rows', '3');
+
+});
+</script>
+{% endblock %}

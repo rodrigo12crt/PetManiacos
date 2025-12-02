@@ -1,0 +1,192 @@
+{% extends 'base.html' %}
+
+{% block title %}Detalhes de {{ pet.name }}{% endblock %}
+
+{% block content %}
+
+<div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-2">
+    <h1 class="display-5">Detalhes de 🐾 {{ pet.name }}</h1>
+    <div class="d-flex">
+        <a href="#" 
+            class="btn btn-outline-danger me-2" 
+            data-bs-toggle="modal" 
+            data-bs-target="#deletePetModal"
+            data-pet-name="{{ pet.name }}"
+            data-pet-id="{{ pet.pk }}">
+            <i class="fas fa-trash-alt"></i> Excluir
+        </a>
+        
+        <a href="{% url 'pet_update' pet.pk %}" class="btn btn-outline-primary me-2">
+            <i class="fas fa-edit"></i> Editar Pet
+        </a>
+        <a href="{% url 'scheduling_create' %}" class="btn btn-success">
+            <i class="fas fa-calendar-plus"></i> Novo Agendamento
+        </a>
+    </div>
+</div>
+
+<div class="row">
+
+    <div class="col-md-4">
+        
+        <div class="card mb-4 shadow-sm">
+            {% if pet.photo %}
+                <div class="card-img-top overflow-hidden" style="height: 250px;">
+                    <img src="{{ pet.photo.url }}" class="w-100 h-100" alt="Foto de {{ pet.name }}" style="object-fit: cover;">
+                </div>
+            {% else %}
+                <div class="text-center py-5 bg-light rounded-top">
+                    <span class="fs-4 text-muted">📸 Sem foto disponível</span>
+                </div>
+            {% endif %}
+
+            <div class="card-body">
+                <h3 class="card-title">{{ pet.name }}</h3>
+                <p class="card-text text-muted">{{ pet.species }} - {{ pet.race|default:"Raça Desconhecida" }}</p>
+            </div>
+        </div>
+
+        <div class="card p-3 mb-4">
+            <h5 class="text-primary border-bottom pb-2 mb-3">Detalhes Físicos e Clínicos</h5>
+            <ul class="list-unstyled">
+                <li><strong>Idade:</strong> {{ pet.age|default:"N/A" }}</li>
+                <li><strong>Sexo:</strong> {{ pet.get_sex_display }}</li>
+                <li><strong>Peso:</strong> {{ pet.weight|default:"N/A" }} kg</li>
+                <li class="mt-3"><strong>Obs. Médicas:</strong>
+                    <p class="text-danger small fst-italic mt-1">
+                        {{ pet.medical_observations|default:"Nenhuma observação médica registrada." }}
+                    </p>
+                </li>
+            </ul>
+        </div>
+
+    </div> <div class="col-md-8">
+
+        <div class="card mb-4 p-4 bg-light shadow-sm">
+            <div class="d-flex justify-content-between align-items-center">
+                <h4 class="text-success">Tutor: {{ pet.tutor.name }}</h4>
+                <a href="{% url 'tutor_update' pet.tutor.pk %}" class="btn btn-sm btn-outline-success">Editar Tutor</a>
+            </div>
+
+            <hr>
+
+            <div class="row small">
+                <div class="col-md-6">
+                    <p class="mb-1"><strong>Email:</strong> {{ pet.tutor.email|default:"N/A" }}</p>
+                    <p class="mb-1"><strong>Telefone:</strong> {{ pet.tutor.phone_number|default:"N/A" }}</p>
+                </div>
+                <div class="col-md-6">
+                    <p class="mb-1"><strong>Localização:</strong>
+                        {{ pet.tutor.city.name|default:"N/A" }}/{{ pet.tutor.state.abbreviation|default:"N/A" }}
+                    </p>
+                    <p class="mb-1"><strong>Endereço:</strong> {{ pet.tutor.address|default:"N/A" }}</p>
+                </div>
+            </div>
+
+            <p class="mt-3 mb-0 text-end fst-italic text-muted small">
+                Como conheceu: {{ pet.tutor.get_know_display|default:"Não informado" }}
+            </p>
+        </div>
+
+        <h3>📋 Histórico de Agendamentos</h3>
+        <hr class="mt-2">
+
+        {% if pet.scheduling_set.all %}
+        <ul class="list-group">
+            {% for agendamento in pet.scheduling_set.all %}
+            <li class="list-group-item d-flex justify-content-between align-items-start">
+                <div class="ms-2 me-auto">
+                    <div class="fw-bold mb-1">
+                        <a href="{% url 'scheduling_update' agendamento.pk %}">
+                            Agendamento de {{ agendamento.date_scheduling|date:"d/m/Y" }}
+                        </a>
+                    </div>
+
+                    Serviços:
+                    {% for service in agendamento.services.all %}
+                    <span class="badge bg-secondary rounded-pill me-1">{{ service.name }}</span>
+                    {% endfor %}
+                    <br>
+                    <small class="text-muted fst-italic mt-1 d-block">
+                        Obs: {{ agendamento.observations|default:"Sem observações." }}
+                    </small>
+                </div>
+
+                <div class="d-flex flex-column align-items-end">
+                    <span class="badge bg-success mb-1">R$ {{ agendamento.total_value|floatformat:2 }}</span>
+
+                    {% if agendamento.status == 'Sim' %}
+                        <span class="badge bg-success">Pago</span>
+                    {% else %}
+                        <span class="badge bg-danger">Pendente</span>
+                    {% endif %}
+                </div>
+            </li>
+            {% endfor %}
+        </ul>
+        {% else %}
+        <div class="alert alert-info" role="alert">
+            Este pet ainda não possui agendamentos registrados.
+        </div>
+        {% endif %}
+
+    </div> </div> <div class="mt-4">
+    <a href="{% url 'pet_list' %}" class="btn btn-secondary">← Voltar para a Lista de Pets</a>
+</div>
+
+<div class="modal fade" id="deletePetModal" tabindex="-1" aria-labelledby="deletePetModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title" id="deletePetModalLabel">
+                    <i class="fas fa-exclamation-triangle"></i> Confirmação de Exclusão
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p class="lead">Tem certeza que deseja excluir o Pet **<span id="petName" class="fw-bold"></span>**?</p>
+                <p class="text-danger small">Esta ação é **permanente** e não pode ser desfeita. Isso também removerá todos os agendamentos vinculados.</p>
+                
+                <form id="deletePetForm" method="post">
+                    {% csrf_token %}
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="submit" class="btn btn-danger" form="deletePetForm">
+                    <i class="fas fa-trash-alt"></i> Confirmar Exclusão
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const deletePetModal = document.getElementById('deletePetModal');
+        
+        deletePetModal.addEventListener('show.bs.modal', function (event) {
+            
+            const button = event.relatedTarget;
+            
+            // Extrai as informações do Pet do botão de excluir
+            const petName = button.getAttribute('data-pet-name');
+            const petId = button.getAttribute('data-pet-id');
+            
+            // 1. Atualiza o nome do Pet no modal
+            const petNameSpan = deletePetModal.querySelector('#petName');
+            petNameSpan.textContent = petName;
+            
+            // 2. Define a URL de exclusão (action) no formulário
+            const deleteForm = deletePetModal.querySelector('#deletePetForm');
+            
+            // Cria a URL de exclusão dinamicamente usando o ID do Pet
+            const deleteUrl = "{% url 'pet_delete' pk=0 %}".replace('0', petId);
+            deleteForm.setAttribute('action', deleteUrl);
+        });
+    });
+</script>
+{% endblock %}

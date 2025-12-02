@@ -1,0 +1,167 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load l10n %}
+
+{% block title %}Dashboard | Pet Daycare{% endblock %}
+
+{% block content %}
+<style>
+    .dashboard-title {
+        font-weight: 800;
+        font-size: 2.3rem;
+        color: #198754;
+    }
+    .metric-card {
+        border: none;
+        border-radius: 16px;
+        transition: transform .2s ease, box-shadow .2s ease;
+    }
+    .metric-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 8px 22px rgba(0,0,0,0.12);
+    }
+    .metric-value {
+        font-size: 3rem;
+        font-weight: 700;
+    }
+    .section-title {
+        font-weight: 600;
+        color: #6c757d;
+        font-size: 1.3rem;
+    }
+    table thead tr {
+        background-color: #f5f6fa;
+    }
+    table tbody tr:hover {
+        background-color: #fafafa;
+    }
+</style>
+
+<div class="container py-4">
+
+    <h1 class="fw-bold text-success text-center mb-3">
+        📊 Dashboard — Pet Maniacos
+    </h1>
+
+    <!-- Botão para ocultar/mostrar valores -->
+    <div class="text-center mb-4">
+        <button id="toggle-valores" class="btn btn-outline-dark btn-sm">
+            👁️ Ocultar valores
+        </button>
+    </div>
+
+    <div class="row g-4 mb-4">
+        <div class="col-md-4">
+            <div class="metric-card p-4 bg-primary text-white shadow-sm h-100">
+                <h5 class="fw-semibold"><i class="fas fa-paw"></i> Total de Pets</h5>
+                <p class="metric-value">{{ total_pets }}</p>
+                <span class="opacity-75 small">Pets cadastrados no sistema</span>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="metric-card p-4 bg-danger text-white shadow-sm h-100">
+                <h5 class="fw-semibold"><i class="fas fa-calendar-times"></i> Pendentes</h5>
+                <p class="metric-value">{{ total_agendamentos_pendentes }}</p>
+                <span class="opacity-75 small">Agendamentos aguardando atendimento</span>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="metric-card p-4 bg-info text-white shadow-sm h-100">
+                <h5 class="fw-semibold"><i class="fas fa-users"></i> Tutores</h5>
+                <p class="metric-value">{{ total_tutors }}</p>
+                <span class="opacity-75 small">Clientes cadastrados</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4 mb-5">
+        <div class="col-md-4">
+            <div class="metric-card p-4 bg-success text-white shadow-sm h-100">
+                <h5 class="fw-semibold"><i class="fas fa-hand-holding-usd"></i> Receita Paga</h5>
+                <p class="metric-value valor-sigiloso">R$ {{ soma_total_pago|localize }}</p>
+                <span class="opacity-75 small">Valores já recebidos</span>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="metric-card p-4 bg-warning text-white shadow-sm h-100">
+                <h5 class="fw-semibold"><i class="fas fa-wallet"></i> A Receber</h5>
+                <p class="metric-value valor-sigiloso">R$ {{ soma_total_pendente|localize }}</p>
+                <span class="opacity-75 small">Pagamentos pendentes</span>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="metric-card p-4 bg-light shadow-sm h-100">
+                <h5 class="fw-semibold text-primary">
+                    <i class="fas fa-chart-line"></i> Ticket Médio
+                </h5>
+                <p class="metric-value text-primary valor-sigiloso">R$ {{ ticket_medio|localize }}</p>
+                <span class="small text-muted">Média geral de agendamentos</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="card shadow-sm p-4">
+        <h4 class="section-title mb-3">📅 Próximos Agendamentos</h4>
+
+        {% if proximos_agendamentos %}
+        <table class="table align-middle table-hover mb-0">
+            <thead>
+                <tr>
+                    <th>Data</th>
+                    <th>Pet</th>
+                    <th>Tutor</th>
+                    <th class="text-end">Valor Total</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for agendamento in proximos_agendamentos %}
+                <tr>
+                    <td>{{ agendamento.date_scheduling|date:"d/m/Y" }}</td>
+                    <td>
+                        <a class="fw-semibold text-decoration-none" href="{% url 'pet_detail' agendamento.pet.pk %}">
+                            {{ agendamento.pet.name }}
+                        </a>
+                    </td>
+                    <td>{{ agendamento.tutor.name }}</td>
+                    <td class="fw-bold text-success text-end valor-sigiloso">
+                        R$ {{ agendamento.total_value|localize }}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <div class="mt-3 text-end">
+            <a href="{% url 'scheduling_list' %}" class="btn btn-outline-secondary btn-sm">
+                Ver todos os agendamentos →
+            </a>
+        </div>
+        {% else %}
+        <p class="text-muted">Nenhum agendamento futuro encontrado.</p>
+        {% endif %}
+    </div>
+
+</div>
+
+<!-- Script para alternar visibilidade dos valores -->
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const btn = document.getElementById("toggle-valores");
+        const valores = document.querySelectorAll(".valor-sigiloso");
+        let oculto = false;
+        let textoOriginal = [];
+
+        valores.forEach((v, i) => textoOriginal[i] = v.textContent);
+
+        btn.addEventListener("click", function () {
+            oculto = !oculto;
+
+            valores.forEach((v, i) => {
+                v.textContent = oculto ? "••••••" : textoOriginal[i];
+            });
+
+            btn.innerHTML = oculto ? "🔓 Mostrar valores" : "👁️ Ocultar valores";
+        });
+    });
+</script>
+
+{% endblock %}

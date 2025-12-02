@@ -1,0 +1,161 @@
+{% extends 'base.html' %}
+{% load l10n %}
+
+{% block title %}Agenda do Daycare{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="fw-bold text-success">📅 Agenda de Agendamentos</h1>
+        <a href="{% url 'scheduling_create' %}" class="btn btn-success shadow-sm px-4">
+            <i class="fas fa-plus"></i> Novo Agendamento
+        </a>
+    </div>
+    
+    <form method="get" class="mb-4">
+        <div class="row justify-content-center g-2">
+            <div class="col-md-6">
+                <div class="input-group shadow-sm">
+                    <span class="input-group-text bg-white">🔍</span>
+                    <input type="text" name="q" class="form-control form-control-lg"
+                        placeholder="Buscar agendamento por nome do tutor..."
+                        value="{{ search_term }}">
+                </div>
+            </div>
+
+            <div class="col-md-3">
+                <select name="status" class="form-select form-select-lg shadow-sm">
+                    <option value="">Todos os status</option>
+                    <option value="Sim" {% if selected_status == "Sim" %}selected{% endif %}>Pago</option>
+                    <option value="Não" {% if selected_status == "Não" %}selected{% endif %}>Pendente</option>
+                </select>
+            </div>
+
+            <div class="col-md-3">
+                <button class="btn btn-primary btn-lg w-100 shadow-sm">Buscar</button>
+            </div>
+        </div>
+    </form>
+
+    <div class="alert alert-light border shadow-sm text-center mb-5 fs-5">
+        📌 Temos atualmente <strong class="text-success">{{ scheduling_list|length }}</strong> agendamentos na lista!
+    </div>
+
+    {% if scheduling_list %}
+    <div class="table-responsive shadow-lg rounded-3">
+        <table class="table table-hover table-striped mb-0 align-middle">
+            <thead class="bg-success text-white">
+                <tr>
+                    <th style="width: 10%;">Data</th>
+                    <th style="width: 15%;">Pet</th>
+                    <th style="width: 15%;">Tutor</th>
+                    <th style="width: 30%;">Serviços</th>
+                    <th class="text-end" style="width: 10%;">Valor Total</th>
+                    <th class="text-center" style="width: 10%;">Status Pgto.</th>
+                    <th class="text-center" style="width: 10%;">Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for scheduling in scheduling_list %}
+                <tr>
+                    <td><strong class="text-primary">{{ scheduling.date_scheduling|date:"d/m/Y" }}</strong></td>
+                    <td>{{ scheduling.pet.name }}</td>
+                    <td>{{ scheduling.tutor.name }}</td>
+                    <td style="max-width: 280px; white-space: normal;">
+                        {% for service in scheduling.services.all %}
+                            <span class="badge bg-info text-dark mb-1 me-1">{{ service.name }}</span>
+                        {% endfor %}
+                    </td>
+                    <td class="text-end fw-bold text-success">
+                        R$ {{ scheduling.total_value|localize }}
+                    </td>
+                    <td class="text-center">
+                        {% if scheduling.status == 'Sim' %}
+                            <span class="badge bg-success px-3 py-2">Pago</span>
+                        {% else %}
+                            <span class="badge bg-danger px-3 py-2">Pendente</span>
+                        {% endif %}
+                    </td>
+                    <td class="text-center text-nowrap">
+                        <a href="{% url 'scheduling_update' scheduling.pk %}" class="btn btn-sm btn-outline-primary me-2" title="Editar">
+                            <i class="fas fa-edit"></i> Editar
+                        </a>
+
+                        {% if scheduling.status == 'Sim' %}
+                            {% if scheduling.note %}
+                                <a href="{% url 'note_detail' scheduling.note.pk %}" class="btn btn-sm btn-success me-2" title="Ver Nota" target="_blank">
+                                    <i class="fas fa-eye"></i> Nota
+                                </a>
+                            {% else %}
+                                <a href="{% url 'generate_note' scheduling.pk %}" class="btn btn-sm btn-info me-2" title="Gerar Nota">
+                                    <i class="fas fa-file-invoice"></i> Gerar Nota
+                                </a>
+                            {% endif %}
+                        {% endif %}
+                        
+                        <a href="#" class="btn btn-sm btn-outline-danger" title="Excluir"
+                            data-bs-toggle="modal"
+                            data-bs-target="#deleteModal"
+                            data-scheduling-id="{{ scheduling.pk }}"
+                            data-scheduling-name="de {{ scheduling.date_scheduling|date:'d/m/Y' }} (Pet: {{ scheduling.pet.name }})">
+                            <i class="fas fa-trash-alt"></i> Excluir
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="alert alert-warning shadow-sm text-center fs-5 py-4">
+        ❌ Nenhum agendamento encontrado no momento. Clique no botão "➕ Novo Agendamento" para começar.
+    </div>
+    {% endif %}
+
+    <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title"><i class="fas fa-exclamation-triangle"></i> Confirmação de Exclusão</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p class="lead">
+                        Tem certeza que deseja excluir o agendamento
+                        <strong><span id="schedulingName" class="fw-bold"></span></strong>?
+                    </p>
+                    <p class="text-danger small">Esta ação é permanente e não pode ser desfeita.</p>
+                    <form id="deleteForm" method="post">{% csrf_token %}</form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-danger" form="deleteForm">
+                        <i class="fas fa-trash-alt"></i> Excluir
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const deleteModal = document.getElementById('deleteModal');
+    
+    deleteModal.addEventListener('show.bs.modal', function (event) {
+        const button = event.relatedTarget; 
+        const schedulingId = button.getAttribute('data-scheduling-id');
+        const schedulingName = button.getAttribute('data-scheduling-name');
+
+        deleteModal.querySelector('#schedulingName').textContent = schedulingName;
+        const deleteForm = deleteModal.querySelector('#deleteForm');
+        const deleteUrl = "{% url 'scheduling_delete' pk=0 %}".replace('0', schedulingId);
+        deleteForm.setAttribute('action', deleteUrl);
+    });
+});
+</script>
+{% endblock %}

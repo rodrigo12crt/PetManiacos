@@ -1,0 +1,108 @@
+{% extends 'base.html' %} 
+{% load static %}
+
+{% block title %}FAQ - Pet Maniacos{% endblock %}
+
+{% block content %}
+<div class="container py-2">
+    <div class="text-center mb-5">
+        <h1 class="text-primary mb-3">Perguntas Frequentes (FAQ)</h1>
+        <p class="lead text-muted">Encontre rapidamente as respostas para suas dúvidas sobre o uso do Pet Maniacos.</p>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+
+            <div class="accordion" id="faqAccordion">
+
+                <h3 class="h5 mt-4 mb-3 text-secondary border-bottom pb-1">Uso Geral e Acesso</h3>
+                
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="headingOne">
+                        <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                            Como faço login no sistema?
+                        </button>
+                    </h2>
+                    <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#faqAccordion">
+                        <div class="accordion-body">
+                            O acesso é restrito a funcionários autorizados. Utilize seu **Nome de Usuário** e **Senha** cadastrados na tela de login. Em caso de problemas, utilize o link "Esqueci a Senha" ou contate o administrador.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="headingTwo">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                            Minha senha está incorreta. Como redefini-la?
+                        </button>
+                    </h2>
+                    <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#faqAccordion">
+                        <div class="accordion-body">
+                            Na tela de login, clique no link **"Esqueci a Senha"**. Você precisará fornecer o e-mail cadastrado. Um link para redefinição de senha será enviado para este e-mail. Se o problema persistir, contate o administrador do sistema.
+                        </div>
+                    </div>
+                </div>
+
+                <h3 class="h5 mt-4 mb-3 text-secondary border-bottom pb-1">Cadastro de Clientes e Animais</h3>
+
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="headingThree">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+                            Como cadastrar um novo Tutor?
+                        </button>
+                    </h2>
+                    <div id="collapseThree" class="accordion-collapse collapse" aria-labelledby="headingThree" data-bs-parent="#faqAccordion">
+                        <div class="accordion-body">
+                            Vá para a seção **"Tutores"** no menu lateral. Clique no botão **"Adicionar Novo Tutor"**. Preencha as informações obrigatórias (Nome, CPF e contato) e salve. Lembre-se que um Tutor deve ser cadastrado antes que possamos vincular um Pet a ele.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="headingFour">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFour" aria-expanded="false" aria-controls="collapseFour">
+                            Como vincular um Pet a um Tutor já existente?
+                        </button>
+                    </h2>
+                    <div id="collapseFour" class="accordion-collapse collapse" aria-labelledby="headingFour" data-bs-parent="#faqAccordion">
+                        <div class="accordion-body">
+                            Acesse a seção **"Pets"** e clique em **"Adicionar Novo Pet"**. No formulário, haverá um campo de busca ou *dropdown* para selecionar o Tutor responsável. Preencha os dados do Pet (Nome, espécie, raça, etc.) e salve.
+                        </div>
+                    </div>
+                </div>
+
+                <h3 class="h5 mt-4 mb-3 text-secondary border-bottom pb-1">Agendamentos e Histórico</h3>
+
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="headingFive">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFive" aria-expanded="false" aria-controls="collapseFive">
+                            Como agendar um novo serviço (Consulta/Banho)?
+                        </button>
+                    </h2>
+                    <div id="collapseFive" class="accordion-collapse collapse" aria-labelledby="headingFive" data-bs-parent="#faqAccordion">
+                        <div class="accordion-body">
+                            Na seção **"Agendamentos"**, clique em **"Novo Agendamento"**. Selecione o Tutor e o Pet, escolha o tipo de Serviço e defina a data/hora. O sistema verifica a disponibilidade automaticamente.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="headingSix">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSix" aria-expanded="false" aria-controls="collapseSix">
+                            Onde vejo o histórico de serviços de um Pet?
+                        </button>
+                    </h2>
+                    <div id="collapseSix" class="accordion-collapse collapse" aria-labelledby="headingSix" data-bs-parent="#faqAccordion">
+                        <div class="accordion-body">
+                            Acesse a seção **"Pets"** e clique no botão **"Detalhes"** ao lado do Pet desejado. A página de detalhes do Pet conterá abas ou listas com o histórico completo de vacinas, serviços realizados e observações médicas.
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="alert alert-info text-center mt-5" role="alert">
+                Não encontrou sua resposta? Entre em contato com o suporte: **[Seu E-mail de Suporte]**
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,138 @@
+{% extends 'base.html' %}
+{% load l10n %}  {# Carrega o filtro |localize para formatação local (vírgula) #}
+
+{% block title %}Lista de Serviços{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="fw-bold text-success">
+            📋 Tabela de Serviços
+        </h1>
+        <a href="{% url 'service_create' %}" class="btn btn-success shadow-sm px-4">
+            <i class="fas fa-plus"></i> Novo Serviço
+        </a>
+    </div>
+
+    <form method="get" class="mb-4">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="input-group shadow-sm">
+                    <span class="input-group-text bg-white">
+                        🔍
+                    </span>
+                    <input type="text" name="q" class="form-control form-control-lg"
+                                placeholder="Buscar serviço pelo nome..."
+                                value="{{ search_term }}">
+                    <button class="btn btn-primary btn-lg px-4">Buscar</button>
+                </div>
+            </div>
+        </div>
+    </form>
+
+    <div class="alert alert-light border shadow-sm text-center mb-5 fs-5">
+        📌 Temos atualmente <strong class="text-success">{{ service_list|length }}</strong> serviços cadastrados!
+    </div>
+
+    {% if service_list %}
+
+    <div class="table-responsive shadow-lg rounded-3">
+        <table class="table table-hover table-striped mb-0">
+            <thead class="bg-success text-white">
+                <tr>
+                    <th scope="col" style="width: 30%;">Nome do Serviço</th>
+                    <th scope="col" style="width: 45%;">Descrição</th>
+                    <th scope="col" class="text-end" style="width: 15%;">Preço (R$)</th>
+                    <th scope="col" class="text-center" style="width: 15%;">Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for service in service_list %}
+                <tr>
+                    <td>
+                        <strong class="text-primary">{{ service.name }}</strong>
+                    </td>
+                    <td>
+                        <span class="text-muted">{{ service.description|default:"N/A"|truncatechars:80 }}</span>
+                    </td>
+                    <td class="text-end fw-bold text-success">
+                        {# Usa o filtro |localize para formatar o preço com o separador decimal do pt-br #}
+                        R$ {{ service.price|localize }}
+                    </td>
+                    <td class="text-center text-nowrap">
+                        <a href="{% url 'service_update' pk=service.pk %}" class="btn btn-sm btn-outline-primary me-2" title="Editar">
+                            <i class="fas fa-edit"></i> Editar
+                        </a>
+                        
+                        <a href="#" 
+                        class="btn btn-sm btn-outline-danger" 
+                        title="Excluir"
+                        data-bs-toggle="modal" 
+                        data-bs-target="#deleteModal"
+                        data-service-id="{{ service.pk }}" 
+                        data-service-name="{{ service.name }}"
+                        >
+                            <i class="fas fa-trash-alt"></i> Excluir
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    {% else %}
+    <div class="alert alert-warning shadow-sm text-center fs-5 py-4">
+        ❌ Nenhum serviço cadastrado. Clique no botão "➕ Novo Serviço" para começar.
+    </div>
+    {% endif %}
+
+
+    <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title" id="deleteModalLabel">
+                        <i class="fas fa-exclamation-triangle"></i> Confirmação de Exclusão
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p class="lead">Tem certeza que deseja excluir o serviço **<span id="serviceName" class="fw-bold"></span>**?</p>
+                    <p class="text-danger small">Esta ação é **permanente** e não pode ser desfeita.</p>
+                    
+                    <form id="deleteForm" method="post">
+                        {% csrf_token %}
+                        </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-danger" form="deleteForm">
+                        <i class="fas fa-trash-alt"></i> Excluir
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const deleteModal = document.getElementById('deleteModal');
+        
+        deleteModal.addEventListener('show.bs.modal', function (event) {
+            const button = event.relatedTarget; 
+            const serviceId = button.getAttribute('data-service-id');
+            const serviceName = button.getAttribute('data-service-name');
+            const serviceNameSpan = deleteModal.querySelector('#serviceName');
+            serviceNameSpan.textContent = serviceName;
+            const deleteForm = deleteModal.querySelector('#deleteForm');
+            const deleteUrl = "{% url 'service_delete' pk=0 %}".replace('0', serviceId);
+            deleteForm.setAttribute('action', deleteUrl);
+        });
+    });
+</script>
+{% endblock %}
