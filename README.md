@@ -38,7 +38,7 @@ Siga os passos abaixo para rodar o projeto localmente.
 ### 🔹 1. Clonar o Repositório
 
 ```bash
-git clone https://github.com/rodrigo12crt/PetManiacos
+git clone https://github.com/rodrigo12crt/PetManiacos.git
 ```
 
 ### 🔹 2. Criar e Ativar o Ambiente Virtual
